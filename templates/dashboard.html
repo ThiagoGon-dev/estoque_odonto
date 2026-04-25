@@ -50,6 +50,10 @@
                         <td style="background-color: {{cor}};">
                             <a href="/entrada/{{item[0]}}" class="btn btn-light btn-sm">Entrada</a>
                             <a href="/edit_item/{{item[0]}}" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="/delete_item/{{item[0]}}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Tem certeza que deseja excluir este item?')">
+                               Excluir
+                            </a>
                         </td>
                     </tr>
 
