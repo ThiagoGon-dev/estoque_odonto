@@ -1,6 +1,6 @@
-import os
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
+import os
 
 app = Flask(__name__)
 app.secret_key = 'segredo'
@@ -145,6 +145,16 @@ def entrada(id):
         return redirect('/dashboard')
 
     return render_template('entrada.html', id=id)
+
+@app.route('/delete_item/<int:id>')
+def delete_item(id):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("DELETE FROM items WHERE id=?", (id,))
+    db.commit()
+
+    return redirect('/dashboard')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
