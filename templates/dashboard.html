@@ -10,8 +10,14 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
+
         <h2>Controle de Estoque</h2>
-        <a href="/add_item" class="btn btn-primary">+ Novo Item</a>
+
+        <div>
+            <a href="/add_item" class="btn btn-primary me-2">+ Novo Item</a>
+            <a href="/logout" class="btn btn-danger">Sair</a>
+        </div>
+
     </div>
 
     <div class="card shadow-lg">
@@ -42,9 +48,7 @@
                     <tr>
                         <td style="background-color: {{cor}}; color: white;">{{item[1]}}</td>
                         <td style="background-color: {{cor}}; color: white;">{{item[2]}}</td>
-                        <td style="background-color: {{cor}}; color: white;">
-                            <strong>{{item[3]}}</strong>
-                        </td>
+                        <td style="background-color: {{cor}}; color: white;"><strong>{{item[3]}}</strong></td>
                         <td style="background-color: {{cor}}; color: white;">{{item[4]}}</td>
                         <td style="background-color: {{cor}}; color: white;">{{item[5]}}</td>
                         <td style="background-color: {{cor}};">
