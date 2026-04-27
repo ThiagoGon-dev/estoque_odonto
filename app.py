@@ -5,14 +5,15 @@ import os
 app = Flask(__name__)
 app.secret_key = 'segredo'
 
+
 def get_db():
     return psycopg2.connect(os.environ.get("DATABASE_URL"))
+
 
 def criar_tabelas():
     db = get_db()
     cursor = db.cursor()
 
-    # Tabela de usuários
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -21,7 +22,6 @@ def criar_tabelas():
     )
     ''')
 
-    # Tabela de itens
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS items (
         id SERIAL PRIMARY KEY,
@@ -36,7 +36,9 @@ def criar_tabelas():
     db.commit()
     db.close()
 
+
 criar_tabelas()
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -55,6 +57,13 @@ def login():
 
     return render_template('login.html')
 
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/')
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -70,6 +79,7 @@ def register():
 
     return render_template('register.html')
 
+
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session:
@@ -81,6 +91,7 @@ def dashboard():
     items = cursor.fetchall()
 
     return render_template('dashboard.html', items=items)
+
 
 @app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
@@ -102,6 +113,7 @@ def add_item():
         return redirect('/dashboard')
 
     return render_template('add_item.html')
+
 
 @app.route('/edit_item/<int:id>', methods=['GET', 'POST'])
 def edit_item(id):
@@ -129,6 +141,7 @@ def edit_item(id):
 
     return render_template('edit_item.html', item=item)
 
+
 @app.route('/entrada/<int:id>', methods=['GET', 'POST'])
 def entrada(id):
     db = get_db()
@@ -148,6 +161,7 @@ def entrada(id):
 
     return render_template('entrada.html', id=id)
 
+
 @app.route('/delete_item/<int:id>')
 def delete_item(id):
     db = get_db()
@@ -157,6 +171,7 @@ def delete_item(id):
     db.commit()
 
     return redirect('/dashboard')
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
