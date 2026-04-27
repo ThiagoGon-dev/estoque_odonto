@@ -1,28 +1,30 @@
 from flask import Flask, render_template, request, redirect, session
-import sqlite3
+import psycopg2
 import os
 
 app = Flask(__name__)
 app.secret_key = 'segredo'
 
 def get_db():
-    return sqlite3.connect('database.db')
+    return psycopg2.connect(os.environ.get("DATABASE_URL"))
 
 def criar_tabelas():
     db = get_db()
     cursor = db.cursor()
 
+    # Tabela de usuários
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         username TEXT,
         password TEXT
     )
     ''')
 
+    # Tabela de itens
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         codigo TEXT,
         nome TEXT,
         quantidade INTEGER,
@@ -44,7 +46,7 @@ def login():
 
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (user, pwd))
+        cursor.execute("SELECT * FROM users WHERE username=%s AND password=%s", (user, pwd))
         result = cursor.fetchone()
 
         if result:
@@ -61,7 +63,7 @@ def register():
 
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user, pwd))
+        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (user, pwd))
         db.commit()
 
         return redirect('/')
@@ -93,7 +95,7 @@ def add_item():
         cursor = db.cursor()
         cursor.execute("""
         INSERT INTO items (codigo, nome, quantidade, estoque_minimo, quantidade_compra)
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s)
         """, (codigo, nome, quantidade, minimo, compra))
 
         db.commit()
@@ -115,14 +117,14 @@ def edit_item(id):
 
         cursor.execute("""
         UPDATE items
-        SET codigo=?, nome=?, quantidade=?, estoque_minimo=?, quantidade_compra=?
-        WHERE id=?
+        SET codigo=%s, nome=%s, quantidade=%s, estoque_minimo=%s, quantidade_compra=%s
+        WHERE id=%s
         """, (codigo, nome, quantidade, minimo, compra, id))
 
         db.commit()
         return redirect('/dashboard')
 
-    cursor.execute("SELECT * FROM items WHERE id=?", (id,))
+    cursor.execute("SELECT * FROM items WHERE id=%s", (id,))
     item = cursor.fetchone()
 
     return render_template('edit_item.html', item=item)
@@ -137,8 +139,8 @@ def entrada(id):
 
         cursor.execute("""
         UPDATE items
-        SET quantidade = quantidade + ?
-        WHERE id=?
+        SET quantidade = quantidade + %s
+        WHERE id=%s
         """, (valor, id))
 
         db.commit()
@@ -151,7 +153,7 @@ def delete_item(id):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("DELETE FROM items WHERE id=?", (id,))
+    cursor.execute("DELETE FROM items WHERE id=%s", (id,))
     db.commit()
 
     return redirect('/dashboard')
